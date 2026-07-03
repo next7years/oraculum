@@ -1,0 +1,172 @@
+[
+  {
+    "candidate_id": "SEED-0004",
+    "name": "李泽明",
+    "current_title": "自动驾驶感知算法负责人",
+    "current_company": "理想汽车",
+    "seniority": "director",
+    "industry": "自动驾驶",
+    "skills": [
+      "BEV",
+      "transformers",
+      "感知",
+      "规划",
+      "多模态",
+      "量产"
+    ]
+  },
+  {
+    "candidate_id": "SEED-0006",
+    "name": "王晨",
+    "current_title": "感知规划研究负责人",
+    "current_company": "图森未来",
+    "seniority": "principal",
+    "industry": "自动驾驶",
+    "skills": [
+      "BEV",
+      "Transformer",
+      "感知",
+      "规划",
+      "传感器融合"
+    ]
+  },
+  {
+    "candidate_id": "SEED-0005",
+    "name": "Mateo Lee",
+    "current_title": "Head of ML · 智驾",
+    "current_company": "小鹏",
+    "seniority": "director",
+    "industry": "自动驾驶",
+    "skills": [
+      "感知",
+      "规划",
+      "端到端",
+      "transformers",
+      "强化学习",
+      "团队管理"
+    ]
+  },
+  {
+    "candidate_id": "SEED-0000",
+    "name": "陈昊然",
+    "current_title": "智能穿戴硬件负责人",
+    "current_company": "华米科技",
+    "seniority": "director",
+    "industry": "机器人·穿戴设备",
+    "skills": [
+      "消费级硬件量产",
+      "可穿戴",
+      "传感器融合",
+      "端上 AI",
+      "固件",
+      "低功耗"
+    ]
+  },
+  {
+    "candidate_id": "SEED-0011",
+    "name": "林子萱",
+    "current_title": "AI 交付技术负责人",
+    "current_company": "Scale AI",
+    "seniority": "senior",
+    "industry": "SaaS",
+    "skills": [
+      "全栈",
+      "LLM 应用",
+      "RAG",
+      "快速原型",
+      "客户沟通",
+      "系统整合"
+    ]
+  },
+  {
+    "candidate_id": "SEED-0013",
+    "name": "赵浩然",
+    "current_title": "AI 应用工程负责人",
+    "current_company": "Ramp",
+    "seniority": "senior",
+    "industry": "SaaS",
+    "skills": [
+      "全栈",
+      "LLM 应用",
+      "Agent 编排",
+      "快速交付",
+      "客户成功",
+      "财税 SaaS"
+    ]
+  },
+  {
+    "candidate_id": "SEED-0003",
+    "name": "Kai Park",
+    "current_title": "可穿戴 AI 算法 + 硬件协同负责人",
+    "current_company": "大疆",
+    "seniority": "staff",
+    "industry": "机器人·穿戴设备",
+    "skills": [
+      "端上 AI",
+      "传感器融合",
+      "嵌入式",
+      "功耗优化",
+      "动作识别",
+      "固件"
+    ]
+  },
+  {
+    "candidate_id": "SYN-001002",
+    "name": "高强芳 002",
+    "current_title": "ML 平台工程师",
+    "current_company": "图森未来",
+    "seniority": "staff",
+    "industry": "大模型·Agentic",
+    "skills": [
+      "PyTorch"
+    ]
+  },
+  {
+    "candidate_id": "SYN-001014",
+    "name": "孙宇芳 014",
+    "current_title": "ML 平台工程师",
+    "current_company": "旷视",
+    "seniority": "director",
+    "industry": "自动驾驶",
+    "skills": [
+      "PyTorch"
+    ]
+  },
+  {
+    "candidate_id": "SYN-001019",
+    "name": "Mia 鑫 Tan 019",
+    "current_title": "Head of ML",
+    "current_company": "百度",
+    "seniority": "director",
+    "industry": "自动驾驶",
+    "skills": [
+      "强化学习",
+      "transformers",
+      "扩散模型",
+      "BEV",
+      "预训练"
+    ]
+  },
+  {
+    "candidate_id": "SYN-001026",
+    "name": "吴浩涛 026",
+    "current_title": "ML 平台工程师",
+    "current_company": "小米",
+    "seniority": "senior",
+    "industry": "机器人·穿戴设备",
+    "skills": [
+      "PyTorch"
+    ]
+  },
+  {
+    "candidate_id": "SYN-001038",
+    "name": "张欣涛 038",
+    "current_title": "ML 平台工程师",
+    "current_company": "小鹏",
+    "seniority": "principal",
+    "industry": "大模型·Agentic",
+    "skills": [
+      "PyTorch"
+    ]
+  }
+]

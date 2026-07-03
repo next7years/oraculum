@@ -1,0 +1,15 @@
+{
+  "_note": "Self-contained STATIC SNAPSHOT copied from the CGL Workstation eval golds (src/cgl/eval/golds/match.jsonl). This is NOT a live connection to CGL -- the data was copied so this Oraculum example is a standalone, reproducible project with zero dependency on CGL. The candidates it references live in candidates.json (also a snapshot). See recall_oracle.py / recall_runner.py for how this feeds the Verdict Engine.",
+  "_symptom_framing": "Verdict Engine judges whether a SYMPTOM reproduces. Here the symptom is 'a known-good (golden) candidate FALLS OUT of the recall top-k'. hit == golden candidate NOT in top-k. Re-running recall N times gives the attempt series the engine aggregates.",
+  "cases": [
+    {
+      "case_id": "future-mobility-head-of-ml",
+      "query_id": "future-mobility-head-of-ml",
+      "description": "自动驾驶感知(BEV+Transformer)量产负责人;对口=理想/图森感知负责人",
+      "top_k": 3,
+      "golden_candidate_ids": ["SEED-0004", "SEED-0006"],
+      "golden_names": {"SEED-0004": "李泽明", "SEED-0006": "王晨"},
+      "source": "CGL match.jsonl :: must_surface=[李泽明,王晨], must_rank_top=3"
+    }
+  ]
+}

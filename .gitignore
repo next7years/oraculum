@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# macOS
+.DS_Store
+
+# Editor / tooling session dirs
+.claude/
+
+# Private design assets / IP — kept on disk, never committed
+docs/
+
+# Generated harnesses (scaffold output)
+oraculum_harness/
