@@ -133,10 +133,12 @@ class AnthropicProposer(ProposerClient):
         last_err: Exception | None = None
         for _ in range(self._max_retries + 1):
             try:
+                # No temperature: forced tool_use already constrains the output, and
+                # newer models (e.g. Haiku 4.5) reject `temperature` as deprecated.
+                # Omitting it works across model generations.
                 resp = client.messages.create(
                     model=self._model,
                     max_tokens=2048,
-                    temperature=0.0,   # classification must be stable/reproducible
                     system=_SYSTEM,
                     tools=[tool],
                     tool_choice={"type": "tool", "name": "emit"},

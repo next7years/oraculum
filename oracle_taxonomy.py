@@ -47,6 +47,15 @@ class Target:
     target: str                              # human name of the thing being evaluated
     oracle_class: OracleClass
     detected_prerequisites: dict = field(default_factory=dict)  # {HAS_*: bool}
+                                             # what the LLM *proposed* it detected. A PROPOSAL,
+                                             # not a fact — the model has a compliance bias and
+                                             # will happily claim a prerequisite exists so the
+                                             # target reads READY. The gate must NOT trust this
+                                             # for release decisions (see confirmed_prerequisites).
+    confirmed_prerequisites: dict = field(default_factory=dict)  # {HAS_*: bool}
+                                             # what the USER explicitly confirmed. Only these
+                                             # unlock a READY that hinges on "we have the golden
+                                             # set / the downstream signal." Judgment stays human.
     rationale: str = ""                      # why this class (audit trail)
     measured_kappa: float | None = None      # judge-vs-human agreement, IF calibration ran
                                              # (from kappa.cohen_kappa). None = not yet measured.
@@ -57,4 +66,9 @@ class Target:
                                              # ceiling measured).
 
     def has(self, prereq: str) -> bool:
+        """What the LLM proposed. Safe for CLASSIFICATION hints, NOT for release gating."""
         return bool(self.detected_prerequisites.get(prereq, False))
+
+    def has_confirmed(self, prereq: str) -> bool:
+        """What the USER confirmed. This is what a READY decision may rely on."""
+        return bool(self.confirmed_prerequisites.get(prereq, False))

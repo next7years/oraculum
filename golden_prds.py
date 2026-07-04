@@ -37,7 +37,7 @@ _add("checkable_exit_code",
 _add("recall_at_k_with_golden",
      Target("golden candidate appears in recall top-k (future-mobility-head-of-ml)",
             OracleClass.CHECKABLE_WITH_REFERENCE,
-            detected_prerequisites={HAS_REFERENCE: True, HAS_GOLDEN_SET: True},
+            confirmed_prerequisites={HAS_REFERENCE: True, HAS_GOLDEN_SET: True},
             rationale="recall@k against the copied CGL golden set (must_surface labels)"),
      Status.READY)
 
@@ -61,7 +61,7 @@ _add("tone_fuzzy_no_golden",
 _add("fuzzy_golden_no_optin",
      Target("summary is faithful to the source",
             OracleClass.FUZZY_JUDGE,
-            detected_prerequisites={HAS_GOLDEN_SET: True},
+            confirmed_prerequisites={HAS_GOLDEN_SET: True},
             rationale="has a golden set, but the user hasn't opted into judge-based eval"),
      Status.NEEDS_INPUT)
 
@@ -69,7 +69,7 @@ _add("fuzzy_golden_no_optin",
 _add("fuzzy_optin_below_kappa",
      Target("summary is faithful to the source (judge κ=0.42)",
             OracleClass.FUZZY_JUDGE,
-            detected_prerequisites={HAS_GOLDEN_SET: True, ALLOW_FUZZY: True},
+            confirmed_prerequisites={HAS_GOLDEN_SET: True, ALLOW_FUZZY: True},
             measured_kappa=0.42,
             rationale="opted in, but judge-human agreement is below the κ≥0.6 bar"),
      Status.BLOCKED)
@@ -78,7 +78,7 @@ _add("fuzzy_optin_below_kappa",
 _add("fuzzy_optin_calibrated",
      Target("summary is faithful to the source (judge κ=0.74)",
             OracleClass.FUZZY_JUDGE,
-            detected_prerequisites={HAS_GOLDEN_SET: True, ALLOW_FUZZY: True},
+            confirmed_prerequisites={HAS_GOLDEN_SET: True, ALLOW_FUZZY: True},
             measured_kappa=0.74,
             rationale="calibrated judge (κ=0.74) stands in for the hard oracle; stamped fuzzy"),
      Status.READY)
@@ -89,7 +89,7 @@ _add("fuzzy_optin_calibrated",
 _add("fuzzy_human_ceiling_collapsed",
      Target("infer the candidate's unspoken real need (judge κ=0.72, experts disagree)",
             OracleClass.FUZZY_JUDGE,
-            detected_prerequisites={HAS_GOLDEN_SET: True, ALLOW_FUZZY: True},
+            confirmed_prerequisites={HAS_GOLDEN_SET: True, ALLOW_FUZZY: True},
             measured_kappa=0.72, human_ceiling=-0.17,
             rationale="judge matches one expert, but expert-vs-expert κ is below the bar: "
                       "no trustworthy ground truth, so the judge's agreement is a mirage"),
@@ -108,4 +108,18 @@ _add("internal_state_unobservable",
      Target("the model 'understands' the user's intent",
             OracleClass.UNOBSERVABLE,
             rationale="no observable signal corresponds to this claim"),
+     Status.BLOCKED)
+
+# 8. THE LLM-optimism case (surfaced by a live Haiku run on an education PRD): the
+# adapter PROPOSED has_downstream_signal=True, but the user never confirmed a real
+# downstream signal exists. The gate must NOT trust the model's claim -> BLOCKED.
+# Guards against "an optimistic LLM says the prerequisite is met, so the target
+# reads READY" — the exact compliance-bias failure this fix closes.
+_add("downstream_llm_claims_signal_unconfirmed",
+     Target("difficulty labels are 'genuinely hard/medium/easy'",
+            OracleClass.DOWNSTREAM_ONLY,
+            detected_prerequisites={HAS_DOWNSTREAM_SIGNAL: True},   # LLM's optimistic claim
+            confirmed_prerequisites={},                            # user confirmed nothing
+            rationale="only real students' results tell you a question is 'hard'; the LLM "
+                      "claiming a signal exists doesn't make one exist"),
      Status.BLOCKED)
