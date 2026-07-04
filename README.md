@@ -61,6 +61,24 @@ self-eval regression guard, and what the thresholds actually cost you.
 Then try the two engines: `python run_engine_b_demo.py` (the interrogation gate)
 and `python run_fuzzy_demo.py` (judge calibration on a recruiting call).
 
+## Two ways to use it
+
+Same tool, same soul (*the judgment is always yours, never the model's*) — two ways
+to reach it:
+
+- **Agent-driven (easiest).** In a Claude Code / Codex session, hand your agent a
+  repo + a PRD and say *"use Oraculum to build my eval — read AGENTS.md."* It runs
+  the check, reads your code, generates the plugin, and **stops to ask you the
+  judgment calls** (what counts as a `hit`, the thresholds). You never touch a file;
+  you just answer the questions. See [`AGENTS.md`](AGENTS.md).
+- **Library / CLI (for keeps).** Integrate Oraculum into your own repo and CI: run
+  `oraculum check` as a merge gate, keep the generated harness alongside your code,
+  own the plugins. Best when the eval should live in your project long-term. See
+  [`TUTORIAL.md`](TUTORIAL.md).
+
+The difference is only *how you express the judgment* — in a conversation (agent) or
+in code (library). Neither one lets the model decide for you.
+
 ## The one line that matters
 
 ```python
@@ -92,6 +110,12 @@ interface is domain-agnostic — **the same `render()` judges both**:
 To wire your own domain, add a plugin that maps your raw signal (a VR frame-state
 probe, a log regex, an HTTP status, a metric threshold) to a per-attempt `hit`.
 The spine does not change.
+
+**You don't have to hand-write that plugin.** Point your coding agent (Claude Code,
+Codex, …) at this repo and say *"use Oraculum to build an eval for my feature — read
+AGENTS.md"*. [`AGENTS.md`](AGENTS.md) tells the agent how to generate the plugin and
+glue in your function — while stopping to ask *you* the judgment calls (what counts as
+a `hit`, the thresholds). The agent does the boilerplate; the judgment stays yours.
 
 **One number is still yours to set — `p_floor`** — the smallest flaky rate you
 insist on ruling out. It sets how many clean attempts a "Not Reproducible"
@@ -129,6 +153,15 @@ build:
 The adapter needs a model to extract targets from free text; set
 `ORACULUM_ANTHROPIC_API_KEY` (or `CGL_`/`ANTHROPIC_API_KEY`, or `--api-key`).
 With no key the CLI refuses loudly rather than emit an empty "all clear" report.
+
+**Wire it into CI (this is the same Library/CLI mode, just on every PR).** A ready-to-
+copy GitHub Actions workflow lives at
+[`.github/workflows/oraculum.yml.example`](.github/workflows/oraculum.yml.example) —
+copy it to `.github/workflows/oraculum.yml`, point `PRD_PATH` at your spec, and add
+an `ORACULUM_ANTHROPIC_API_KEY` repo secret. A BLOCKED target fails the job, so a
+"your new AI feature has no honest oracle" merge gets stopped — like a linter, but
+for eval honesty. (Honest caveat: the check makes real API calls, so it needs that
+key; there's no free "all clear".)
 
 Once a target is READY, close the loop back to Engine A:
 

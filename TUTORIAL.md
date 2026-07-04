@@ -1,8 +1,14 @@
 # Oraculum Tutorial — from your AI feature to a self-guarding eval
 
-This is the hands-on guide. The other docs (`PRD.md`, `TDD.md`, the spec) explain
-*why* Oraculum works the way it does. This one just shows you *how to use it on
-your own product*, start to finish, with a real recruiting example.
+This is the hands-on guide to using Oraculum on your own product, start to finish,
+with a real recruiting example. The `README.md` explains *why* it works the way it
+does.
+
+> **Which mode is this?** This tutorial covers the **Library / CLI** way — you
+> integrate Oraculum into your own repo and CI. If you'd rather just hand a repo + a
+> PRD to your coding agent and answer its questions in a chat session, that's the
+> **Agent-driven** way — point it at [`AGENTS.md`](AGENTS.md) instead. Same tool,
+> same rule that the judgment stays yours; only the surface differs.
 
 If you have 30 seconds: run `python run_demo.py` and `python run_engine_b_demo.py`,
 then come back here.
@@ -101,7 +107,25 @@ These import the real `verdict_engine` spine. They run today — they just have
 
 ---
 
-## Step 3 — Fill in the ONE predicate (this is all you write)
+## Step 3 — Wire in your signal (let your AI agent do the boilerplate)
+
+You need to connect Oraculum to *your* system and define one thing: **"did the
+symptom happen this attempt?"** You don't have to hand-write the plumbing.
+
+### The easy path: ask your coding agent
+
+If you use Claude Code, Codex, or similar, just point it at this repo and say:
+
+> *"Use Oraculum to build an eval for my `<feature>`. Read AGENTS.md."*
+
+There's an [`AGENTS.md`](AGENTS.md) in the repo written for exactly this — it tells
+your agent how to generate the plugin, glue in your real function, and add fixtures.
+**One important thing it's told to do: STOP and ask you the judgment calls** — above
+all *"what counts as a hit?"*, plus thresholds like `p_floor` and (for fuzzy targets)
+the κ bar. That's deliberate: Oraculum's whole point is that the *judgment* is yours,
+not the model's. The agent does the typing; you make the calls.
+
+### The manual path (if you want to see exactly what's happening)
 
 Open `<target>_oracle.py`. The only thing you must define is: **"did the symptom
 happen this attempt?"** For recall, the symptom is *"the golden candidate fell out
