@@ -39,6 +39,12 @@ Everything below is just those two engines, used in order.
   (or `CGL_`/`ANTHROPIC_API_KEY`). The key is only used by the thin adapter that
   reads your PRD; the judgment itself is deterministic.
 
+> **How to run the commands below.** No install needed — from the repo root, every
+> `oraculum <cmd>` in this guide is just `python cli.py <cmd>`. If you'd rather have a
+> real `oraculum` command, `pip install -e .` once (it adds the console script and,
+> with `.[llm]`, the Anthropic SDK for `check`). Examples below show `python cli.py …`
+> so they work with zero setup.
+
 ---
 
 ## Step 1 — Ask the real question first: *can I even build an honest eval?*
@@ -58,7 +64,7 @@ We have a labeled golden set of past shortlists for (1).
 Run the gate:
 
 ```
-oraculum check my_prd.md
+python cli.py oraculum check my_prd.md
 ```
 
 You get a readiness report. For the PRD above it says:
@@ -89,7 +95,7 @@ blocked — so you can drop this into CI exactly like a linter:
 Only target (1) is READY. Generate its harness stub:
 
 ```
-oraculum scaffold my_prd.md --out my_harness
+python cli.py oraculum scaffold my_prd.md --out my_harness
 ```
 
 For each READY target you get three files (blocked targets are reported and
@@ -243,10 +249,10 @@ isn't.
 
 ```
 # 1. interrogate — can I honestly eval this? (fails CI if anything is theater)
-oraculum check my_prd.md
+python cli.py oraculum check my_prd.md
 
 # 2. scaffold — emit harness stubs for the READY targets only
-oraculum scaffold my_prd.md --out my_harness
+python cli.py oraculum scaffold my_prd.md --out my_harness
 
 # 3. edit my_harness/<target>_oracle.py   -> fill in the one predicate
 # 4. edit my_harness/<target>_runner.py   -> wire capture_signal_once() to your system

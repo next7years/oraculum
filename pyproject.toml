@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oraculum"
+version = "0.1.0"
+description = "Honest measurement for AI-native building — a verdict discipline for agent-system evals."
+readme = "README.md"
+requires-python = ">=3.9"
+# The core is stdlib-only and has NO runtime dependencies. The LLM adapter/judge
+# needs the Anthropic SDK, but only for `oraculum check` / a live fuzzy judge —
+# install it as an extra: `pip install -e .[llm]`.
+dependencies = []
+
+[project.optional-dependencies]
+llm = ["anthropic>=0.40"]
+
+[project.scripts]
+# Makes `oraculum` a real command after `pip install -e .`
+oraculum = "cli:main"
+
+# Flat, single-file modules (no package directory) — list them explicitly.
+[tool.setuptools]
+py-modules = [
+  "cli", "engine_b", "report", "readiness_gate", "oracle_taxonomy",
+  "llm_adapter", "scaffold", "verdict_engine", "kappa", "fuzzy_oracle",
+  "recall_oracle", "recall_runner", "example_exception_oracle",
+  "golden_fixtures", "golden_prds", "golden_kappa",
+]

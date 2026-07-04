@@ -156,7 +156,7 @@ judge.
 way a linter or type-checker gates a merge:
 
 ```
-oraculum check path/to/prd.md
+python cli.py oraculum check path/to/prd.md
 ```
 
 It reads the PRD, runs Engine B (the LLM adapter proposes targets, the
@@ -186,7 +186,7 @@ key; there's no free "all clear".)
 Once a target is READY, close the loop back to Engine A:
 
 ```
-oraculum scaffold path/to/prd.md --out oraculum_harness
+python cli.py oraculum scaffold path/to/prd.md --out oraculum_harness
 ```
 
 This emits a Verdict-Engine harness stub — a SymptomSpec + plugin skeleton
