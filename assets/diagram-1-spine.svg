@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" width="760" height="300" font-family="-apple-system, Segoe UI, Roboto, sans-serif" role="img" aria-label="A model proposes, deterministic rules judge; the verdict never crosses the line.">
+  <rect x="0" y="0" width="760" height="300" rx="10" fill="#faf8f3"/>
+  <rect x="0.5" y="0.5" width="759" height="299" rx="10" fill="none" stroke="#e5dfd2" stroke-width="1"/>
+
+  <text x="28" y="38" font-size="20" font-weight="700" fill="#23201a">A model proposes. Rules judge.</text>
+  <text x="28" y="58" font-size="12.5" fill="#6e675a">The verdict never crosses the line — the same spine under both engines.</text>
+
+  <!-- the boundary line -->
+  <line x1="380" y1="76" x2="380" y2="284" stroke="#23201a" stroke-width="2.5"/>
+
+  <!-- column headers -->
+  <text x="196" y="98" text-anchor="middle" font-size="12" font-weight="700" letter-spacing="0.5" fill="#5b6b60">PROPOSE</text>
+  <text x="196" y="114" text-anchor="middle" font-size="11" fill="#8a8577">a model may act &amp; suggest</text>
+  <text x="566" y="98" text-anchor="middle" font-size="12" font-weight="700" letter-spacing="0.5" fill="#2f5239">JUDGE</text>
+  <text x="566" y="114" text-anchor="middle" font-size="11" fill="#8a8577">deterministic, inspectable rules</text>
+
+  <!-- Engine A -->
+  <text x="28" y="168" font-size="13" font-weight="700" fill="#23201a">Engine A</text>
+  <text x="28" y="185" font-size="11.5" fill="#6e675a">did a bug reproduce?</text>
+  <rect x="112" y="146" width="168" height="50" rx="8" fill="#eef1f4" stroke="#b9c2cc" stroke-width="1"/>
+  <text x="196" y="168" text-anchor="middle" font-size="12.5" font-family="ui-monospace, Menlo, monospace" fill="#23201a">plugin observes</text>
+  <text x="196" y="184" text-anchor="middle" font-size="10.5" fill="#6e675a">signal → hit / miss series</text>
+  <line x1="280" y1="171" x2="474" y2="171" stroke="#8a8577" stroke-width="1.5"/>
+  <path d="M474,171 l-9,-4 l0,8 z" fill="#8a8577"/>
+  <rect x="482" y="146" width="168" height="50" rx="8" fill="#e7efe9" stroke="#6fa483" stroke-width="1"/>
+  <text x="566" y="168" text-anchor="middle" font-size="12.5" font-family="ui-monospace, Menlo, monospace" fill="#23201a">render()</text>
+  <text x="566" y="184" text-anchor="middle" font-size="10" fill="#6e675a">STABLE · FLAKY · NOT_REPRO</text>
+
+  <!-- Engine B -->
+  <text x="28" y="246" font-size="13" font-weight="700" fill="#23201a">Engine B</text>
+  <text x="28" y="263" font-size="11.5" fill="#6e675a">can I honestly eval it?</text>
+  <rect x="112" y="224" width="168" height="50" rx="8" fill="#eef1f4" stroke="#b9c2cc" stroke-width="1"/>
+  <text x="196" y="246" text-anchor="middle" font-size="12.5" font-family="ui-monospace, Menlo, monospace" fill="#23201a">LLM adapter</text>
+  <text x="196" y="262" text-anchor="middle" font-size="10.5" fill="#6e675a">PRD text → target + class</text>
+  <line x1="280" y1="249" x2="474" y2="249" stroke="#8a8577" stroke-width="1.5"/>
+  <path d="M474,249 l-9,-4 l0,8 z" fill="#8a8577"/>
+  <rect x="482" y="224" width="168" height="50" rx="8" fill="#e7efe9" stroke="#6fa483" stroke-width="1"/>
+  <text x="566" y="246" text-anchor="middle" font-size="12.5" font-family="ui-monospace, Menlo, monospace" fill="#23201a">gate()</text>
+  <text x="566" y="262" text-anchor="middle" font-size="10" fill="#6e675a">READY · NEEDS_INPUT · BLOCKED</text>
+</svg>

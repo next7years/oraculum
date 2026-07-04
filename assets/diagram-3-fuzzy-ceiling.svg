@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" width="760" height="380" font-family="-apple-system, Segoe UI, Roboto, sans-serif" role="img" aria-label="A fuzzy target passes four honest gates; if the human experts disagree, no judge can be trusted and it blocks.">
+  <rect x="0" y="0" width="760" height="380" rx="10" fill="#faf8f3"/>
+  <rect x="0.5" y="0.5" width="759" height="379" rx="10" fill="none" stroke="#e5dfd2" stroke-width="1"/>
+
+  <text x="28" y="38" font-size="20" font-weight="700" fill="#23201a">Fuzzy? Earn the right to judge it.</text>
+  <text x="28" y="58" font-size="12.5" fill="#6e675a">Four honest gates. The third is the one nobody else has.</text>
+
+  <!-- legend -->
+  <rect x="470" y="28" width="11" height="11" rx="2" fill="#e7efe9" stroke="#6fa483"/><text x="486" y="38" font-size="10.5" fill="#6e675a">READY</text>
+  <rect x="548" y="28" width="11" height="11" rx="2" fill="#f3eee2" stroke="#c2ab6e"/><text x="564" y="38" font-size="10.5" fill="#6e675a">NEEDS_INPUT</text>
+  <rect x="660" y="28" width="11" height="11" rx="2" fill="#f7e9e6" stroke="#c98a7a"/><text x="676" y="38" font-size="10.5" fill="#6e675a">BLOCKED</text>
+
+  <!-- spine -->
+  <line x1="52" y1="78" x2="52" y2="300" stroke="#23201a" stroke-width="2.5"/>
+
+  <!-- gate 1 -->
+  <circle cx="52" cy="100" r="5" fill="#23201a"/>
+  <text x="72" y="96" font-size="12.5" font-weight="600" fill="#23201a">Is there a golden set?</text>
+  <text x="72" y="112" font-size="10.5" fill="#8a8577">human-labeled cases to calibrate against</text>
+  <rect x="500" y="86" width="238" height="28" rx="7" fill="#f7e9e6" stroke="#c98a7a"/>
+  <text x="514" y="105" font-size="11.5" font-weight="700" fill="#a5533f">BLOCKED — no, can’t calibrate</text>
+
+  <!-- gate 2 -->
+  <circle cx="52" cy="152" r="5" fill="#23201a"/>
+  <text x="72" y="148" font-size="12.5" font-weight="600" fill="#23201a">Did you opt in to a judge?</text>
+  <text x="72" y="164" font-size="10.5" fill="#8a8577">trusting an LLM judge is a conscious choice</text>
+  <rect x="500" y="138" width="238" height="28" rx="7" fill="#f3eee2" stroke="#c2ab6e"/>
+  <text x="514" y="157" font-size="11.5" font-weight="700" fill="#8a7228">NEEDS_INPUT — decide first</text>
+
+  <!-- gate 3: ceiling -->
+  <circle cx="52" cy="212" r="6" fill="#c0442a"/>
+  <text x="72" y="205" font-size="12.5" font-weight="600" fill="#23201a">Do the experts agree with each other?</text>
+  <text x="72" y="221" font-size="10.5" fill="#8a8577">expert-vs-expert κ — the ceiling on any judge</text>
+  <rect x="500" y="190" width="238" height="42" rx="7" fill="#f7e9e6" stroke="#c98a7a"/>
+  <text x="514" y="210" font-size="11.5" font-weight="700" fill="#a5533f">BLOCKED — κ = −0.17</text>
+  <text x="514" y="226" font-size="10.5" fill="#6e675a">experts disagree → no true answer exists</text>
+
+  <!-- gate 4 -->
+  <circle cx="52" cy="272" r="5" fill="#23201a"/>
+  <text x="72" y="268" font-size="12.5" font-weight="600" fill="#23201a">Does the judge agree with humans? (κ ≥ 0.6)</text>
+  <text x="72" y="284" font-size="10.5" fill="#8a8577">below the bar → a fancy random number generator</text>
+  <rect x="500" y="258" width="110" height="28" rx="7" fill="#f7e9e6" stroke="#c98a7a"/>
+  <text x="514" y="277" font-size="11.5" font-weight="700" fill="#a5533f">BLOCKED</text>
+  <rect x="620" y="258" width="118" height="28" rx="7" fill="#e7efe9" stroke="#6fa483"/>
+  <text x="634" y="277" font-size="11.5" font-weight="700" fill="#3f7a55">READY (fuzzy)</text>
+
+  <!-- callout -->
+  <rect x="28" y="318" width="710" height="48" rx="8" fill="#fbf6ee" stroke="#c98a7a"/>
+  <text x="44" y="340" font-size="12.5" font-weight="700" fill="#23201a">The trap it catches:</text>
+  <text x="150" y="340" font-size="11.5" fill="#6e675a">a judge can score κ=0.72 against ONE expert and look READY —</text>
+  <text x="44" y="357" font-size="11.5" fill="#6e675a">but if the two experts sit at κ=−0.17, that agreement is a mirage. A judge can’t beat its ground truth. So it refuses.</text>
+</svg>

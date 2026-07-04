@@ -88,6 +88,26 @@ render(EvidenceBundle, Thresholds) -> VerdictResult
 Pure, deterministic, and domain-agnostic. Judgment lives in inspectable,
 versioned rules — not in a model's whim.
 
+## How it works (at a glance)
+
+**One spine, two engines — a model proposes, deterministic rules judge.** The
+verdict never lives in the model.
+
+![The shared spine: a model proposes, rules judge; the verdict never crosses the line](assets/diagram-1-spine.svg)
+
+**The verdict forks — and the refusals are the discipline.** A failed positive
+control voids every "absent"; "not reproducible" is only earned after enough clean
+runs to be statistically sure (228, at `p_floor=0.02`).
+
+![The verdict fork: STABLE / FLAKY / NOT_REPRO / INCONCLUSIVE, with the refusal branches highlighted](assets/diagram-2-verdict-fork.svg)
+
+**For fuzzy targets, trust is earned, not assumed.** An LLM judge only counts once
+it's calibrated against humans (Cohen's κ) — and it can never be more trustworthy
+than the humans themselves. If the experts disagree, there's no ground truth to
+calibrate against, so it refuses.
+
+![The fuzzy gradient and the human ceiling: four gates, blocking when experts disagree at κ=-0.17](assets/diagram-3-fuzzy-ceiling.svg)
+
 ## Spine vs plugins
 
 - **Spine (reusable, app-agnostic):** `verdict_engine.py` — the contracts,
