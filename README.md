@@ -51,12 +51,15 @@ probabilistic world.
 ## Quickstart
 
 ```
-python run_demo.py
+git clone https://github.com/next7years/oraculum && cd oraculum && python run_demo.py
 ```
 
 No dependencies (Python 3.9+, stdlib only). You'll see: one case end-to-end
 through a swappable oracle, the full decision tree over golden fixtures, the
 self-eval regression guard, and what the thresholds actually cost you.
+
+Then try the two engines: `python run_engine_b_demo.py` (the interrogation gate)
+and `python run_fuzzy_demo.py` (judge calibration on a recruiting call).
 
 ## The one line that matters
 
