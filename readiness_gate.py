@@ -75,8 +75,9 @@ def gate(t: Target, kappa_min: float = KAPPA_MIN) -> GateResult:
     # must consciously opt in to trusting an LLM judge, AND that judge must be shown
     # (via Cohen's κ) to actually agree with human ground truth. Four sub-cases:
     if oc == OracleClass.FUZZY_JUDGE:
-        # 2a -- no golden set: can't calibrate at all -> theater. (unchanged spirit)
-        if not t.has(HAS_GOLDEN_SET):
+        # 2a -- no golden set: can't calibrate at all -> theater. Only a USER-CONFIRMED
+        # golden set counts; the LLM merely claiming one exists is not enough.
+        if not t.has_confirmed(HAS_GOLDEN_SET):
             return out(Status.BLOCKED, "fuzzy_judge_uncalibrated",
                        blocked_on=[HAS_GOLDEN_SET], fuzzy=True,
                        forced_questions=["Where is the human-labeled golden set to calibrate "
@@ -88,7 +89,7 @@ def gate(t: Target, kappa_min: float = KAPPA_MIN) -> GateResult:
                            "(Gu et al. 2024; Zheng et al. 2023).")
         # 2b -- has a golden set but the user hasn't consciously opted in: don't quietly
         # start trusting a judge on their behalf. Make them choose.
-        if not t.has(ALLOW_FUZZY):
+        if not t.has_confirmed(ALLOW_FUZZY):
             return out(Status.NEEDS_INPUT, "fuzzy_requires_opt_in",
                        blocked_on=[ALLOW_FUZZY], fuzzy=True,
                        forced_questions=["This target has no hard oracle — judging it means "
@@ -141,8 +142,10 @@ def gate(t: Target, kappa_min: float = KAPPA_MIN) -> GateResult:
                        "may stand in for the hard oracle here — but the verdict is stamped "
                        "fuzzy: it rests on judge-human agreement, not a predicate.")
 
-    # Rule 3 -- downstream-only correctness with no downstream signal defined: block.
-    if oc == OracleClass.DOWNSTREAM_ONLY and not t.has(HAS_DOWNSTREAM_SIGNAL):
+    # Rule 3 -- downstream-only correctness with no USER-CONFIRMED downstream signal: block.
+    # The LLM will optimistically claim a signal exists (compliance bias); that claim does
+    # not release the gate. Only a signal the user actually confirmed does.
+    if oc == OracleClass.DOWNSTREAM_ONLY and not t.has_confirmed(HAS_DOWNSTREAM_SIGNAL):
         return out(Status.BLOCKED, "downstream_signal_missing",
                    blocked_on=[HAS_DOWNSTREAM_SIGNAL],
                    forced_questions=["What real-world downstream outcome tells you this "
@@ -153,7 +156,7 @@ def gate(t: Target, kappa_min: float = KAPPA_MIN) -> GateResult:
                        "the exact Goodhart trap this product exists to prevent (PRD §2).")
 
     # Rule 4 -- checkable-with-reference but no reference: solvable, needs the ref.
-    if oc == OracleClass.CHECKABLE_WITH_REFERENCE and not t.has(HAS_REFERENCE):
+    if oc == OracleClass.CHECKABLE_WITH_REFERENCE and not t.has_confirmed(HAS_REFERENCE):
         return out(Status.NEEDS_INPUT, "reference_missing",
                    blocked_on=[HAS_REFERENCE],
                    forced_questions=["What is the reference / ground-truth source (e.g. a "
