@@ -154,6 +154,67 @@ keeps the eval from quietly rotting.
 
 ---
 
+## Step 6 — When the target is *fuzzy* (no hard right answer)
+
+So far the `hit` came from a hard predicate — the candidate is in the top-k, or the
+exception was raised. But some targets have **no checkable answer**: "is this reply
+warm and professional?", "did we capture the manager's *real* need?" There's no
+string to compare against; two experts might reasonably disagree. That's a **fuzzy**
+target.
+
+The tempting move is to let an LLM be the judge ("Claude, is this reply warm?"). That
+part is trivial. The hard — and honest — part is: **why would you trust that judge?**
+An unvalidated judge is a fancy random number generator that *looks* authoritative.
+So Oraculum makes trust something you *earn*, not assume.
+
+**1. Fuzzy is never silent — you opt in.** Judging with an LLM is a conscious choice.
+Set `allow_fuzzy` on the target. Otherwise the gate returns NEEDS_INPUT: *"this has no
+hard oracle; trusting a judge is a decision you make with eyes open."*
+
+**2. Calibrate the judge against humans (Cohen's κ).** You bring a small **golden
+set** — items a human labeled PASS/FAIL. The judge labels the same items; `kappa.py`
+computes **κ**, how much the judge agrees with the human beyond chance (κ=1 perfect,
+0 ≈ guessing). The bar defaults to **κ ≥ 0.6** ("substantial"; tune it like
+`p_floor`). Below the bar → BLOCKED: an uncalibrated judge is theater. Note: *raw*
+agreement lies — 82% agreement can still be κ=0.56, because a lot of it was luck. κ
+is the honest number.
+
+**3. The ceiling: a judge can't be more trustworthy than your ground truth.** This is
+the subtle one. If you have **two** annotators, first check whether *they* agree
+(expert-vs-expert κ). If the humans themselves don't agree, there is **no trustworthy
+answer** — and a judge that matches one of them is a mirage, not trust. The gate
+BLOCKs *before* even looking at the judge's κ. **Always use at least two annotators on
+a fuzzy target** — with one, you can never discover that the task has no real answer.
+
+Put together, a fuzzy target lands in one of four honest states:
+
+```
+no golden set              -> BLOCKED     (can't calibrate at all)
+golden, but no opt-in      -> NEEDS_INPUT (choose to trust a judge, explicitly)
+opted in, experts disagree -> BLOCKED     (no trustworthy ground truth — the ceiling)
+opted in, judge κ < bar    -> BLOCKED     (judge not calibrated enough)
+opted in, κ ≥ bar          -> READY       (stamped "fuzzy", carries its κ)
+```
+
+Even when READY, the verdict is **permanently stamped `fuzzy`** and carries the κ it
+rests on — downstream always knows this came from a calibrated judge, not a predicate.
+
+**See it on a real example:** `python run_fuzzy_demo.py` runs one recruiting intake
+call through three judgments of rising fuzziness — *extract what was stated* (κ high →
+READY), *read the manager's tone* (κ high → READY), and *infer the unspoken real need*
+(the two experts agree at only κ=-0.17 → BLOCKED). It doesn't pretend to read between
+the lines; it **measures** whether that's honestly evaluable, and refuses where it
+isn't.
+
+> **Where the golden labels come from (the real question).** In the demo they're
+> synthetic. In real use, the "expert" is whoever's judgment defines *your* standard —
+> you, a senior recruiter, or best of all a **downstream outcome** (who actually got
+> hired / passed the final round) which needs no manual labeling. Budget a few dozen
+> items, labeled by **two** people. That cost is a feature: if a target isn't worth a
+> few dozen labels, it isn't worth pretending to eval.
+
+---
+
 ## The whole loop, in five commands
 
 ```
