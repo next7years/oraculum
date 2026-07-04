@@ -45,6 +45,11 @@
   input[type=range]::-webkit-slider-thumb:hover { box-shadow:0 0 0 5px rgba(126,160,224,0.18); }
   input[type=range]::-moz-range-thumb { width:16px; height:16px; border-radius:50%; background:#ECE7DB; border:2px solid #7EA0E0; cursor:pointer; }
   a { color: inherit; }
+  /* Demo 4: pin a stable height in the two-column layout so the tab/auto-play
+     carousel (Extract → Tone → Infer → raw toggle) can't reflow the page below it. */
+  @media (min-width: 861px) {
+    #d4-grid { min-height: 720px; }
+  }
 </style>
 </head>
 <body>
@@ -509,7 +514,7 @@
 
       <div id="d4-tabs" style="display:flex; gap:2px; margin:28px 0 20px 0; flex-wrap:wrap;"></div>
 
-      <div data-stack style="display:grid; grid-template-columns:0.82fr 1.18fr; gap:2px; background:#E5DFD2; border:1px solid #E5DFD2; min-height:430px;">
+      <div id="d4-grid" data-stack style="display:grid; grid-template-columns:0.82fr 1.18fr; gap:2px; background:#E5DFD2; border:1px solid #E5DFD2;">
         <!-- the target -->
         <div style="background:#F5F1E9; padding:28px; display:flex; flex-direction:column;">
           <div id="d4-fuzz" style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:#938B7B; margin-bottom:16px;"></div>
