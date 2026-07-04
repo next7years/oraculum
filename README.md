@@ -154,6 +154,15 @@ The adapter needs a model to extract targets from free text; set
 `ORACULUM_ANTHROPIC_API_KEY` (or `CGL_`/`ANTHROPIC_API_KEY`, or `--api-key`).
 With no key the CLI refuses loudly rather than emit an empty "all clear" report.
 
+**Wire it into CI (this is the same Library/CLI mode, just on every PR).** A ready-to-
+copy GitHub Actions workflow lives at
+[`.github/workflows/oraculum.yml.example`](.github/workflows/oraculum.yml.example) —
+copy it to `.github/workflows/oraculum.yml`, point `PRD_PATH` at your spec, and add
+an `ORACULUM_ANTHROPIC_API_KEY` repo secret. A BLOCKED target fails the job, so a
+"your new AI feature has no honest oracle" merge gets stopped — like a linter, but
+for eval honesty. (Honest caveat: the check makes real API calls, so it needs that
+key; there's no free "all clear".)
+
 Once a target is READY, close the loop back to Engine A:
 
 ```

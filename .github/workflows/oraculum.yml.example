@@ -1,0 +1,56 @@
+# Oraculum eval-readiness gate — example GitHub Actions workflow.
+#
+# This is the CI form of the Library/CLI mode: run `oraculum check` on your PRD on
+# every PR, and FAIL THE BUILD if any target isn't honestly evaluable — exactly the
+# way a linter or type-checker gates a merge. This is the "gate on the agentic coding
+# loop" made concrete.
+#
+# TO USE:
+#   1. Copy this file to `.github/workflows/oraculum.yml` (drop the `.example`).
+#   2. Set `PRD_PATH` below to your PRD / feature-spec file.
+#   3. Add a repo secret `ORACULUM_ANTHROPIC_API_KEY` (Settings → Secrets → Actions).
+#      The check needs a model to read your PRD into targets — this costs real API
+#      calls, so it's a key you provide, not free. (No key => the check refuses
+#      loudly rather than emit a fake "all clear".)
+#
+# Exit-code contract (the gate):
+#   0  all targets READY               -> job passes
+#   1  some NEEDS_INPUT, none BLOCKED   -> see `continue-on-error` note below
+#   2  at least one BLOCKED             -> job fails, merge blocked
+
+name: oraculum-eval-gate
+
+on:
+  pull_request:
+    # Optional: only run when the PRD or the eval harness changes.
+    # paths: ["**/PRD.md", "specs/**", "oraculum_harness/**"]
+
+jobs:
+  eval-readiness:
+    runs-on: ubuntu-latest
+    env:
+      PRD_PATH: docs/PRD.md   # <-- point this at YOUR PRD / feature spec
+      ORACULUM_ANTHROPIC_API_KEY: ${{ secrets.ORACULUM_ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Vendor Oraculum. (Pin a tag/SHA in real use instead of main.)
+      - name: Get Oraculum
+        run: git clone --depth 1 https://github.com/next7years/oraculum .oraculum
+
+      # The gate. A BLOCKED target exits non-zero and fails the job.
+      - name: Oraculum eval-readiness check
+        run: python .oraculum/cli.py check "$PRD_PATH"
+
+      # If you want NEEDS_INPUT (exit 1) to WARN rather than FAIL, use this instead of
+      # the step above and gate only on BLOCKED (exit 2):
+      #
+      #   - name: Oraculum check (block only on BLOCKED)
+      #     run: |
+      #       python .oraculum/cli.py check "$PRD_PATH"; code=$?
+      #       if [ "$code" -eq 2 ]; then exit 1; fi   # fail only on a hard BLOCK
+      #       exit 0
