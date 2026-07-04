@@ -1,0 +1,55 @@
+{
+  "_note": "Golden labels for the meeting-notes fuzzy demo. Three targets at increasing fuzziness. Each item is a claim the judge evaluates PASS/FAIL against the transcript; labels are what human expert(s) said. The THIRD target deliberately carries TWO experts' labels that disagree — because 'infer the unspoken real need' has no reliable ground truth, and that low human-human agreement is the honest result, not a bug.",
+  "_meeting": "meeting_notes.md",
+
+  "targets": [
+    {
+      "target_id": "extract_stated",
+      "name": "Extract explicitly stated requirements",
+      "fuzziness": "low — this is really CHECKABLE_WITH_REFERENCE: was X said out loud?",
+      "criterion": "Is this requirement EXPLICITLY stated in the transcript?",
+      "items": [
+        {"claim": "Base compensation up to 210k", "human": "P"},
+        {"claim": "Go or Rust as the primary language", "human": "P"},
+        {"claim": "Comfortable with Kafka or similar event streaming", "human": "P"},
+        {"claim": "Seven-plus years of experience mentioned", "human": "P"},
+        {"claim": "Fintech/payments background is required", "human": "F"},
+        {"claim": "Candidate must relocate to NYC full-time", "human": "F"},
+        {"claim": "Strong Postgres / database experience", "human": "P"},
+        {"claim": "A signing bonus was offered", "human": "F"}
+      ]
+    },
+
+    {
+      "target_id": "judge_tone",
+      "name": "Judge the manager's ATTITUDE / emphasis (tone)",
+      "fuzziness": "medium — reading emphasis and hesitation, not facts",
+      "criterion": "Does the manager clearly signal this as a real priority (by tone/emphasis), not just mention it?",
+      "items": [
+        {"claim": "Collaboration / working-style is a top priority", "human": "P"},
+        {"claim": "The manager is flexible on the '2 days in office' policy", "human": "P"},
+        {"claim": "The manager is anxious about team morale", "human": "P"},
+        {"claim": "The manager is in a rush to fill the seat at any cost", "human": "F"},
+        {"claim": "Raw technical brilliance is the single most important trait", "human": "F"},
+        {"claim": "The manager cares more about scale experience than years", "human": "P"}
+      ]
+    },
+
+    {
+      "target_id": "infer_unspoken",
+      "name": "Infer the UNSPOKEN real need (read between the lines)",
+      "fuzziness": "high — inferring intent never said aloud; even experts disagree",
+      "criterion": "Is this the candidate's/manager's TRUE underlying need, even if not stated directly?",
+      "note": "Two human experts labeled this independently. Their disagreement is the point: there is no reliable ground truth for 'what he really means', so κ will be low and the gate will honestly BLOCK it.",
+      "items": [
+        {"claim": "The role is effectively fully-remote-friendly despite the 'hybrid' label", "human_a": "P", "human_b": "P"},
+        {"claim": "'Senior' really means 'emotionally stabilizing', not just technically senior", "human_a": "P", "human_b": "F"},
+        {"claim": "The manager would actually accept a mid-level engineer with great EQ", "human_a": "P", "human_b": "F"},
+        {"claim": "Payments-domain experience secretly matters more than he admits", "human_a": "F", "human_b": "P"},
+        {"claim": "The 'end of quarter' timeline is soft and he'll wait months for the right person", "human_a": "P", "human_b": "P"},
+        {"claim": "He is really looking for a future tech-lead, not an individual contributor", "human_a": "F", "human_b": "P"},
+        {"claim": "Compensation can stretch well past the stated 220k for the right person", "human_a": "F", "human_b": "F"}
+      ]
+    }
+  ]
+}
