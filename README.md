@@ -1,32 +1,42 @@
 # Oraculum
 
-**The honest-eval gate for the agentic coding loop — so your agent iterates
-toward a real target, not a Goodhart proxy.**
+# Honest measurement for AI-native building.
 
-Andrew Ng describes building software as three nested loops: the **agentic coding
-loop** (an agent writes code, tests it, and iterates until it meets the spec), the
-**developer feedback loop** (you review and steer, updating the spec), and the
-external feedback loop (the world, via A/B tests and production data). *Evals are
-the bridge between the first two* — they carry your intent into the agent's inner
-loop and tell it whether it got there.
+**A verdict discipline for everything you build with AI — it tells you where you
+can honestly measure, and refuses to fake it where you can't. Across all three
+loops.**
 
-But that bridge is only load-bearing if the eval is **honest**. An agentic loop's
-whole job is to converge on its success signal — so if that signal is fake (a
-fuzzy target with no calibration set, a downstream outcome with no signal), the
-agent converges *efficiently on a Goodhart proxy*. The faster it iterates, the
-more confidently it's wrong.
+AI made *building* fast. So every loop of development now races toward its success
+signal faster than ever — and racing toward a *fake* signal is just being wrong
+faster, and more confidently. The scarce thing is no longer build speed; it's
+**whether the signal each loop is chasing is honest.** Oraculum is that layer of
+honesty.
 
-**Oraculum guards the entrance to that loop.** Before you hand a spec to an agent,
-it asks — per target — whether an honest eval is even *possible*, refuses to green-
-light the ones that would be theater, and for the rest emits a self-guarding
-harness the agent can iterate against. Every decision is a **machine-checkable
-verdict** with *no agent self-assessment* anywhere in it.
+Andrew Ng frames building as three nested loops, each with a different source of
+truth: the **agentic coding loop** (the agent, judged by your *spec*), the
+**developer feedback loop** (you, judged by your *intent*), and the **external
+feedback loop** — product-market fit — (the *world*, judged by real users). No
+single eval works across all three; the sources of truth are too different. What
+carries across is one **discipline**: *judge honestly where you can; where you
+can't, say so plainly and hand the bet back to you.* Checkable → judge.
+Fuzzy-without-ground-truth → refuse. That same rule runs in every loop.
 
-- **Developer feedback loop (you):** `oraculum check <prd>` — before the agent
-  runs, confirm which targets can be honestly evaluated; blocked ones fail CI.
-- **Agentic coding loop (the agent):** `oraculum scaffold <prd>` — emit the honest
-  verifier the agent tests against while it iterates. (We do *not* touch the
-  external feedback loop — that signal comes from the world, not from us.)
+- **Agentic coding loop:** `oraculum check <prd>` gates it — before an agent
+  iterates, confirm which targets can be honestly evaluated (blocked ones fail
+  CI); `oraculum scaffold` then emits the self-guarding verifier the agent tests
+  against.
+- **Developer feedback loop:** the readiness report *is* your steering signal —
+  it names which parts of the spec are eval-ready and which are your to-do.
+- **Product-market-fit loop:** the discipline holds, the boundary is the point —
+  we force your PMF hypothesis to be falsifiable and read noisy market signal with
+  statistical power, but we **do not tell you what your PMF is**. That truth lives
+  in the future and in your users; a tool that pretends to answer it would be the
+  exact theater we exist to kill.
+
+Every decision is a **machine-checkable verdict** with *no agent self-assessment*
+anywhere in it. *(Today the built engines cover loops 1–2 end-to-end; the Loop-3
+hypothesis-gate and signal-oracle are the same two engines pointed at a new source
+of truth — on the roadmap, not yet shipped.)*
 
 Its Phase-1 core is the **Verdict Engine** (`verdict_engine.py`) — a
 *probabilistic test oracle* that judges whether a bug reproduced:
