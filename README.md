@@ -93,6 +93,12 @@ To wire your own domain, add a plugin that maps your raw signal (a VR frame-stat
 probe, a log regex, an HTTP status, a metric threshold) to a per-attempt `hit`.
 The spine does not change.
 
+**You don't have to hand-write that plugin.** Point your coding agent (Claude Code,
+Codex, …) at this repo and say *"use Oraculum to build an eval for my feature — read
+AGENTS.md"*. [`AGENTS.md`](AGENTS.md) tells the agent how to generate the plugin and
+glue in your function — while stopping to ask *you* the judgment calls (what counts as
+a `hit`, the thresholds). The agent does the boilerplate; the judgment stays yours.
+
 **One number is still yours to set — `p_floor`** — the smallest flaky rate you
 insist on ruling out. It sets how many clean attempts a "Not Reproducible"
 verdict requires: `S >= ln(alpha) / ln(1 - p_floor)`. At `p_floor=0.02,
