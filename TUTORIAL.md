@@ -1,8 +1,14 @@
 # Oraculum Tutorial — from your AI feature to a self-guarding eval
 
-This is the hands-on guide. The other docs (`PRD.md`, `TDD.md`, the spec) explain
-*why* Oraculum works the way it does. This one just shows you *how to use it on
-your own product*, start to finish, with a real recruiting example.
+This is the hands-on guide to using Oraculum on your own product, start to finish,
+with a real recruiting example. The `README.md` explains *why* it works the way it
+does.
+
+> **Which mode is this?** This tutorial covers the **Library / CLI** way — you
+> integrate Oraculum into your own repo and CI. If you'd rather just hand a repo + a
+> PRD to your coding agent and answer its questions in a chat session, that's the
+> **Agent-driven** way — point it at [`AGENTS.md`](AGENTS.md) instead. Same tool,
+> same rule that the judgment stays yours; only the surface differs.
 
 If you have 30 seconds: run `python run_demo.py` and `python run_engine_b_demo.py`,
 then come back here.

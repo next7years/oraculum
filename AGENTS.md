@@ -5,6 +5,29 @@ You are an AI coding agent (Claude Code, Codex, etc.). A user asked you to set u
 Follow it exactly. The whole point of Oraculum is honesty, so the one thing you must
 NOT do is fake a judgment on the user's behalf (see the STOP rule below).
 
+## The session playbook (the common case)
+
+A user hands you their **repo + a PRD** in a chat session and says "build my eval."
+Here's the whole arc — do the work, but treat every judgment as a question for them:
+
+1. **Orient.** Skim their repo and PRD. Get Oraculum (`pip`-free; clone or vendor it).
+2. **Interrogate the PRD** — run `oraculum check` (or reason through the taxonomy in
+   `oracle_taxonomy.py`). Tell the user which targets are READY / NEEDS_INPUT /
+   BLOCKED, and *why*. **Relay BLOCKs honestly — don't quietly "fix" them to seem
+   helpful.** A blocked target is information the user needs.
+3. **For each READY target, propose a plugin — then STOP.** Before writing the
+   predicate, ask: *"What counts as a `hit` here?"* Show them your understanding of
+   their signal and let them correct it.
+4. **Generate the plugin + runner + fixtures**, gluing in their real function. Ask
+   them to confirm the fixtures' expected verdicts and any threshold (`p_floor`, and
+   for fuzzy the κ bar + who labels the golden set).
+5. **Run it**, show the verdict and the derived numbers, explain what they cost.
+
+The user should finish the session having made every *judgment* and typed *nothing*.
+That's the mode: you do the plumbing; the human owns the calls. If at any step you
+feel the urge to just pick a threshold or invent a label "to keep things moving" —
+that urge is the exact failure Oraculum exists to prevent. Ask instead.
+
 ## What Oraculum is (30-second model)
 
 A model may *act and propose*; deterministic, inspectable rules *judge*. The verdict

@@ -61,6 +61,24 @@ self-eval regression guard, and what the thresholds actually cost you.
 Then try the two engines: `python run_engine_b_demo.py` (the interrogation gate)
 and `python run_fuzzy_demo.py` (judge calibration on a recruiting call).
 
+## Two ways to use it
+
+Same tool, same soul (*the judgment is always yours, never the model's*) — two ways
+to reach it:
+
+- **Agent-driven (easiest).** In a Claude Code / Codex session, hand your agent a
+  repo + a PRD and say *"use Oraculum to build my eval — read AGENTS.md."* It runs
+  the check, reads your code, generates the plugin, and **stops to ask you the
+  judgment calls** (what counts as a `hit`, the thresholds). You never touch a file;
+  you just answer the questions. See [`AGENTS.md`](AGENTS.md).
+- **Library / CLI (for keeps).** Integrate Oraculum into your own repo and CI: run
+  `oraculum check` as a merge gate, keep the generated harness alongside your code,
+  own the plugins. Best when the eval should live in your project long-term. See
+  [`TUTORIAL.md`](TUTORIAL.md).
+
+The difference is only *how you express the judgment* — in a conversation (agent) or
+in code (library). Neither one lets the model decide for you.
+
 ## The one line that matters
 
 ```python
