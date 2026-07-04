@@ -83,6 +83,18 @@ _add("fuzzy_optin_calibrated",
             rationale="calibrated judge (κ=0.74) stands in for the hard oracle; stamped fuzzy"),
      Status.READY)
 
+# 5d. THE ceiling-collapse case (a real Haiku run surfaced this): the judge agrees
+# with one annotator (κ=0.72) but the annotators themselves don't agree (κ=-0.17).
+# High judge-vs-one-human κ is a mirage when there's no shared human truth -> BLOCKED.
+_add("fuzzy_human_ceiling_collapsed",
+     Target("infer the candidate's unspoken real need (judge κ=0.72, experts disagree)",
+            OracleClass.FUZZY_JUDGE,
+            detected_prerequisites={HAS_GOLDEN_SET: True, ALLOW_FUZZY: True},
+            measured_kappa=0.72, human_ceiling=-0.17,
+            rationale="judge matches one expert, but expert-vs-expert κ is below the bar: "
+                      "no trustworthy ground truth, so the judge's agreement is a mirage"),
+     Status.BLOCKED)
+
 # 6. downstream-only correctness, no downstream signal -> BLOCKED
 _add("recommendation_downstream_no_signal",
      Target("recommended candidate eventually gets hired",

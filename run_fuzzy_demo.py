@@ -86,10 +86,12 @@ def run():
         judge_labels = [judge.judge("", t["criterion"]) for _ in items]
         k = cohen_kappa(judge_labels, human)
 
-        # build the Target and gate it (opted in, so we exercise the κ bar)
+        # build the Target and gate it (opted in, so we exercise the κ bar). Pass the
+        # human ceiling when we have two experts — this is what catches a judge that
+        # agrees with one annotator while the annotators disagree with each other.
         target = Target(t["name"], OracleClass.FUZZY_JUDGE,
                         detected_prerequisites={HAS_GOLDEN_SET: True, ALLOW_FUZZY: True},
-                        measured_kappa=k.kappa)
+                        measured_kappa=k.kappa, human_ceiling=human_ceiling)
         r = gate(target)
 
         print(f"▸ {t['name']}")

@@ -50,6 +50,11 @@ class Target:
     rationale: str = ""                      # why this class (audit trail)
     measured_kappa: float | None = None      # judge-vs-human agreement, IF calibration ran
                                              # (from kappa.cohen_kappa). None = not yet measured.
+    human_ceiling: float | None = None       # human-vs-human agreement (κ between expert
+                                             # annotators). The CEILING on trust: a judge can't
+                                             # be more trustworthy than the ground truth it's
+                                             # calibrated against. None = single annotator (no
+                                             # ceiling measured).
 
     def has(self, prereq: str) -> bool:
         return bool(self.detected_prerequisites.get(prereq, False))

@@ -92,8 +92,10 @@ class AnthropicJudge(Judge):
                 "input_schema": {"type": "object", "required": ["verdict"],
                                  "properties": {"verdict": {"type": "string",
                                                             "enum": [PASS, FAIL]}}}}
+        # max_tokens must be large enough to finish the tool-call JSON; too small
+        # (e.g. 16) truncates it and the tool_use block comes back with empty input.
         resp = client.messages.create(
-            model=self._model, max_tokens=16, temperature=0.0,
+            model=self._model, max_tokens=64, temperature=0.0,
             system=("You judge whether an output meets a criterion. Emit PASS if it "
                     "clearly meets it, FAIL otherwise. Binary only."),
             tools=[tool], tool_choice={"type": "tool", "name": "verdict"},

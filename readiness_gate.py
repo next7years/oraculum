@@ -97,6 +97,28 @@ def gate(t: Target, kappa_min: float = KAPPA_MIN) -> GateResult:
                                          "as judge-based, not predicate-based."],
                        why="Fuzzy eval is never silent. Trusting a judge is a conscious "
                            "decision you make with eyes open — not a default the tool slips in.")
+        # 2c-ceiling -- THE deepest fuzzy rule (surfaced by running a real judge):
+        # a judge can't be more trustworthy than the ground truth it's calibrated to.
+        # If the human annotators themselves don't agree (human_ceiling < the bar), then
+        # there is NO trustworthy truth to calibrate against — and a judge's high agreement
+        # with any *single* annotator is a mirage, not trust. Block BEFORE looking at the
+        # judge's κ, because the judge's κ is meaningless once the ceiling has collapsed.
+        c = t.human_ceiling
+        if c is not None and c < kappa_min:
+            return out(Status.BLOCKED, "no_trustworthy_ground_truth", fuzzy=True,
+                       measured_kappa=t.measured_kappa,
+                       blocked_on=["human_ceiling>=%.2f" % kappa_min],
+                       forced_questions=[f"Your human annotators only agree at κ={c:.2f} "
+                                         f"(< {kappa_min:.2f}) — they don't share a definition of "
+                                         f"'correct'. A judge that matches one of them isn't "
+                                         f"trustworthy; it's mimicking a coin flip. Either sharpen "
+                                         f"the rubric until experts agree, or accept this is a "
+                                         f"human judgment call, not an automatable eval."],
+                       why=f"No trustworthy ground truth: expert-vs-expert agreement is κ={c:.2f}, "
+                           f"below the κ ≥ {kappa_min:.2f} bar. You cannot calibrate a judge to a "
+                           "truth that doesn't exist — a judge can't be more reliable than the "
+                           "humans it's measured against (the anti-Goodhart ceiling).")
+
         # 2c -- opted in, but calibration not run / κ below the bar: the judge isn't
         # trustworthy yet. Still theater, just a subtler kind.
         k = t.measured_kappa
