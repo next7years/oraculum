@@ -18,8 +18,13 @@ from enum import Enum
 
 from oracle_taxonomy import (
     Target, OracleClass,
-    HAS_REFERENCE, HAS_GOLDEN_SET, HAS_DOWNSTREAM_SIGNAL,
+    HAS_REFERENCE, HAS_GOLDEN_SET, HAS_DOWNSTREAM_SIGNAL, ALLOW_FUZZY,
 )
+
+# Landis-Koch "substantial agreement". The one number you own for fuzzy: how much
+# judge-vs-human agreement (Cohen's κ) you require before trusting an LLM judge.
+# Tune it like p_floor; the default is the literature-standard bar.
+KAPPA_MIN = 0.6
 
 
 class Status(str, Enum):
@@ -37,15 +42,20 @@ class GateResult:
     blocked_on: list = field(default_factory=list)      # missing prerequisites
     forced_questions: list = field(default_factory=list)  # the questions you must answer
     why: str = ""                       # human explanation, WITH a literature anchor
+    fuzzy: bool = False                 # this verdict rests on an LLM judge, not a hard
+                                        # predicate -- a permanent honesty stamp for downstream
+    measured_kappa: float | None = None  # the judge-vs-human κ this READY/BLOCK rests on
 
 
-def gate(t: Target) -> GateResult:
+def gate(t: Target, kappa_min: float = KAPPA_MIN) -> GateResult:
     """Apply the deterministic gating rules (order-as-rule, first match wins)."""
 
-    def out(status, reason_code, blocked_on=None, forced_questions=None, why=""):
+    def out(status, reason_code, blocked_on=None, forced_questions=None, why="",
+            fuzzy=False, measured_kappa=None):
         return GateResult(target=t.target, oracle_class=t.oracle_class, status=status,
                           reason_code=reason_code, blocked_on=blocked_on or [],
-                          forced_questions=forced_questions or [], why=why)
+                          forced_questions=forced_questions or [], why=why,
+                          fuzzy=fuzzy, measured_kappa=measured_kappa)
 
     oc = t.oracle_class
 
@@ -61,17 +71,53 @@ def gate(t: Target) -> GateResult:
                        "function over observed behavior; with nothing observed there is "
                        "no function to define).")
 
-    # Rule 2 -- fuzzy correctness with no golden set: an uncalibrated judge is theater.
-    if oc == OracleClass.FUZZY_JUDGE and not t.has(HAS_GOLDEN_SET):
-        return out(Status.BLOCKED, "fuzzy_judge_uncalibrated",
-                   blocked_on=[HAS_GOLDEN_SET],
-                   forced_questions=["Where is the human-labeled golden set to calibrate "
-                                     "the judge against? What judge-vs-human agreement "
-                                     "(Cohen's κ) will you require before trusting it?"],
-                   why="An uncalibrated LLM judge on a fuzzy target ≈ theater: judges "
-                       "carry position/verbosity/self-preference bias and must be "
-                       "calibrated against a golden set before they're trusted "
-                       "(Gu et al. 2024; Zheng et al. 2023).")
+    # Rule 2 -- FUZZY_JUDGE: a graded, honest path. Fuzzy is never silent; the user
+    # must consciously opt in to trusting an LLM judge, AND that judge must be shown
+    # (via Cohen's κ) to actually agree with human ground truth. Four sub-cases:
+    if oc == OracleClass.FUZZY_JUDGE:
+        # 2a -- no golden set: can't calibrate at all -> theater. (unchanged spirit)
+        if not t.has(HAS_GOLDEN_SET):
+            return out(Status.BLOCKED, "fuzzy_judge_uncalibrated",
+                       blocked_on=[HAS_GOLDEN_SET], fuzzy=True,
+                       forced_questions=["Where is the human-labeled golden set to calibrate "
+                                         "the judge against? What judge-vs-human agreement "
+                                         "(Cohen's κ) will you require before trusting it?"],
+                       why="An uncalibrated LLM judge on a fuzzy target ≈ theater: judges "
+                           "carry position/verbosity/self-preference bias and must be "
+                           "calibrated against a golden set before they're trusted "
+                           "(Gu et al. 2024; Zheng et al. 2023).")
+        # 2b -- has a golden set but the user hasn't consciously opted in: don't quietly
+        # start trusting a judge on their behalf. Make them choose.
+        if not t.has(ALLOW_FUZZY):
+            return out(Status.NEEDS_INPUT, "fuzzy_requires_opt_in",
+                       blocked_on=[ALLOW_FUZZY], fuzzy=True,
+                       forced_questions=["This target has no hard oracle — judging it means "
+                                         "trusting an LLM judge. Opt in explicitly (allow_fuzzy) "
+                                         "to proceed; the verdict will be permanently stamped "
+                                         "as judge-based, not predicate-based."],
+                       why="Fuzzy eval is never silent. Trusting a judge is a conscious "
+                           "decision you make with eyes open — not a default the tool slips in.")
+        # 2c -- opted in, but calibration not run / κ below the bar: the judge isn't
+        # trustworthy yet. Still theater, just a subtler kind.
+        k = t.measured_kappa
+        if k is None or k < kappa_min:
+            have = "not measured" if k is None else f"κ={k:.2f}"
+            return out(Status.BLOCKED, "fuzzy_judge_below_kappa",
+                       blocked_on=["judge_calibration>=%.2f" % kappa_min], fuzzy=True,
+                       measured_kappa=k,
+                       forced_questions=[f"Calibrate the judge against the golden set and reach "
+                                         f"κ ≥ {kappa_min:.2f} (Landis-Koch 'substantial'). "
+                                         f"Currently {have}. A judge that doesn't agree with "
+                                         f"humans is a fancy random number generator."],
+                       why="You opted into a judge, but it isn't calibrated to trust yet: "
+                           f"judge-vs-human agreement is {have}, below the κ ≥ {kappa_min:.2f} "
+                           "bar. Below-bar agreement ≈ theater with extra steps.")
+        # 2d -- opted in AND the judge clears the κ bar: honestly evaluable, with a
+        # permanent fuzzy stamp + the κ it rests on.
+        return out(Status.READY, "fuzzy_judge_calibrated", fuzzy=True, measured_kappa=k,
+                   why=f"A human-calibrated judge (κ={k:.2f} ≥ {kappa_min:.2f}, 'substantial') "
+                       "may stand in for the hard oracle here — but the verdict is stamped "
+                       "fuzzy: it rests on judge-human agreement, not a predicate.")
 
     # Rule 3 -- downstream-only correctness with no downstream signal defined: block.
     if oc == OracleClass.DOWNSTREAM_ONLY and not t.has(HAS_DOWNSTREAM_SIGNAL):

@@ -93,7 +93,34 @@ def part_c_fail_loud():
     print()
 
 
+def part_d_fuzzy():
+    from kappa import cohen_kappa
+    from fuzzy_oracle import FakeJudge, judge_labels_for_calibration, PASS, FAIL
+    from golden_kappa import check as kappa_check
+    print("=" * 72)
+    print("D. Fuzzy eval: calibrate the judge (κ), then gate on it (never silent)")
+    print("=" * 72)
+    # calibration: a deterministic judge vs human golden labels
+    outputs = ["ok", "ok2", "BAD hallucination", "fine", "BAD made-up", "clean"]
+    human   = [PASS,  PASS,  FAIL,                PASS,   FAIL,          PASS]
+    judge = FakeJudge(bad_markers=("BAD",))
+    jl = judge_labels_for_calibration(outputs, "summary faithful to source", judge)
+    k = cohen_kappa(jl, human)
+    print(f"  calibrate: judge vs human over {k.n} items -> κ={k.kappa} ({k.band})")
+    print(f"             -> judge is {'TRUSTED' if k.kappa >= 0.6 else 'NOT trusted'} "
+          f"(bar κ≥0.6)\n")
+    print("  the gate refuses to trust a judge silently — the four honest states:")
+    print("    fuzzy + no golden            -> BLOCKED     (can't calibrate)")
+    print("    fuzzy + golden, no opt-in    -> NEEDS_INPUT (you must choose to trust a judge)")
+    print("    fuzzy + opt-in, κ below bar  -> BLOCKED     (judge not calibrated enough)")
+    print("    fuzzy + opt-in, κ ≥ bar      -> READY       (stamped fuzzy, carries its κ)\n")
+    ok, _ = kappa_check()
+    from golden_kappa import GOLDEN_KAPPA
+    print(f"  κ's own eval seed: {ok}/{len(GOLDEN_KAPPA)} calibration verdicts match.\n")
+
+
 if __name__ == "__main__":
     part_a_end_to_end()
     part_b_guard()
     part_c_fail_loud()
+    part_d_fuzzy()

@@ -12,7 +12,7 @@ not a model prior (PRD P3).
 """
 from oracle_taxonomy import (
     Target, OracleClass,
-    HAS_REFERENCE, HAS_GOLDEN_SET, HAS_DOWNSTREAM_SIGNAL,
+    HAS_REFERENCE, HAS_GOLDEN_SET, HAS_DOWNSTREAM_SIGNAL, ALLOW_FUZZY,
 )
 from readiness_gate import Status
 
@@ -57,12 +57,30 @@ _add("tone_fuzzy_no_golden",
             rationale="tone correctness is expert judgment; no calibration set"),
      Status.BLOCKED)
 
-# 5. fuzzy judgment WITH a calibration golden set -> READY (calibrated judge is ok)
-_add("tone_fuzzy_with_golden",
-     Target("summary is faithful to the source (calibrated judge)",
+# 5. fuzzy + golden but NO conscious opt-in -> NEEDS_INPUT (never trust a judge silently)
+_add("fuzzy_golden_no_optin",
+     Target("summary is faithful to the source",
             OracleClass.FUZZY_JUDGE,
             detected_prerequisites={HAS_GOLDEN_SET: True},
-            rationale="fuzzy, but a human-labeled golden set exists to calibrate κ"),
+            rationale="has a golden set, but the user hasn't opted into judge-based eval"),
+     Status.NEEDS_INPUT)
+
+# 5b. fuzzy + golden + opted in but judge NOT calibrated to the bar -> BLOCKED
+_add("fuzzy_optin_below_kappa",
+     Target("summary is faithful to the source (judge κ=0.42)",
+            OracleClass.FUZZY_JUDGE,
+            detected_prerequisites={HAS_GOLDEN_SET: True, ALLOW_FUZZY: True},
+            measured_kappa=0.42,
+            rationale="opted in, but judge-human agreement is below the κ≥0.6 bar"),
+     Status.BLOCKED)
+
+# 5c. fuzzy + golden + opted in + judge clears the κ bar -> READY (with fuzzy stamp)
+_add("fuzzy_optin_calibrated",
+     Target("summary is faithful to the source (judge κ=0.74)",
+            OracleClass.FUZZY_JUDGE,
+            detected_prerequisites={HAS_GOLDEN_SET: True, ALLOW_FUZZY: True},
+            measured_kappa=0.74,
+            rationale="calibrated judge (κ=0.74) stands in for the hard oracle; stamped fuzzy"),
      Status.READY)
 
 # 6. downstream-only correctness, no downstream signal -> BLOCKED

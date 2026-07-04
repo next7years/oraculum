@@ -36,6 +36,8 @@ class OracleClass(str, Enum):
 HAS_REFERENCE = "has_reference"            # a ground-truth / reference source is available
 HAS_GOLDEN_SET = "has_golden_set"          # a labeled, calibration golden set exists
 HAS_DOWNSTREAM_SIGNAL = "has_downstream_signal"  # a downstream outcome signal is defined
+ALLOW_FUZZY = "allow_fuzzy"                # user CONSCIOUSLY opted in to LLM-judge eval
+                                           # (fuzzy is never silent; you choose to trust a judge)
 
 
 @dataclass
@@ -46,6 +48,8 @@ class Target:
     oracle_class: OracleClass
     detected_prerequisites: dict = field(default_factory=dict)  # {HAS_*: bool}
     rationale: str = ""                      # why this class (audit trail)
+    measured_kappa: float | None = None      # judge-vs-human agreement, IF calibration ran
+                                             # (from kappa.cohen_kappa). None = not yet measured.
 
     def has(self, prereq: str) -> bool:
         return bool(self.detected_prerequisites.get(prereq, False))
