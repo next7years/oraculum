@@ -150,6 +150,27 @@ itself can regress; running `render(fixture) == expected` is the judge's own
 regression guard. The judge sits above the pipeline; this set sits above the
 judge.
 
+## Capture & admissibility (sealed evidence)
+
+A verdict is only as honest as the evidence it consumes, and in AI-native
+development the entity under evaluation (a coding agent) often *produces its own
+evidence* — "the tests pass." The `capture_*` modules make that honesty a
+verifiable property: signals are captured at a boundary the agent cannot write to
+(`capture_subprocess.py` re-executes the check in a fresh subprocess), appended to a
+SHA-256 hash-chained log (`capture_log.py`) so any mutation, reorder, deletion, or
+tail-truncation is detectable, and stamped with provenance (`capture_provenance.py`)
+recording where/how the evidence was observed.
+
+Before `render()` ever runs, a new deterministic gate — `judge_admissibility()` in
+`capture_admissibility.py` — decides whether the evidence may reach the judge at
+all (chain of custody precedes trial). `render_with_admissibility()` wraps the spine
+without editing it: inadmissible evidence never reaches `render()`. The layer
+dogfoods Oraculum's own discipline — `run_tamper_eval.py --ci` proves tamper
+detection holds (the chain's correctness certificate is a verdict rendered by the
+judge it feeds), `golden_admissibility.py` guards the gate, and
+`run_capture_demo.py` runs the end-to-end "lying agent" story offline. All of it is
+stdlib-only and gated in CI by `.github/workflows/capture-golden.yml`.
+
 ## Engine B in your dev flow (the CI gate)
 
 `cli.py` wraps the interrogation gate as a check you can drop into CI, exactly the

@@ -1,0 +1,67 @@
+name: capture-golden
+
+# Regression gate for the sealed-capture layer (capture-v0 §8). Any change that
+# weakens tamper detection, loosens the admissibility gate, or lets a self-report
+# through breaks this workflow with a named reason code. Everything is offline,
+# deterministic, stdlib-only -- no secrets, no network, no LLM.
+
+on:
+  pull_request:
+    paths:
+      - "capture_*.py"
+      - "golden_admissibility.py"
+      - "run_tamper_eval.py"
+      - "run_capture_demo.py"
+      - ".github/workflows/capture-golden.yml"
+  push:
+    branches: [main]
+    paths:
+      - "capture_*.py"
+      - "golden_admissibility.py"
+      - "run_tamper_eval.py"
+      - "run_capture_demo.py"
+      - ".github/workflows/capture-golden.yml"
+  workflow_dispatch:
+
+jobs:
+  capture-golden:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Spine goldens still green (render(fixture) == expected)
+        run: |
+          python -c "
+          from verdict_engine import render
+          from golden_fixtures import GOLDEN
+          bad = 0
+          for name, bundle, exp_v, exp_sub in GOLDEN:
+              r = render(bundle)
+              ok = (r.verdict == exp_v) and (exp_sub is None or r.sub_state == exp_sub)
+              if not ok:
+                  bad += 1
+                  print('FAIL', name, '->', r.verdict.value)
+          print('%d/%d spine goldens match' % (len(GOLDEN) - bad, len(GOLDEN)))
+          raise SystemExit(1 if bad else 0)
+          "
+
+      - name: Admissibility goldens (exit != 0 on any fixture mismatch)
+        run: python golden_admissibility.py
+
+      - name: Tamper eval must render CONFIRMED_NOT_REPRO
+        run: python run_tamper_eval.py --ci
+
+      - name: Lying-agent story must hold
+        run: python run_capture_demo.py --ci
+
+      - name: Capture infra self-checks (store / provenance / sealed subprocess)
+        run: |
+          python capture_store.py
+          python capture_provenance.py
+          python capture_subprocess.py
