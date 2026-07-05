@@ -27,4 +27,8 @@ py-modules = [
   "llm_adapter", "scaffold", "verdict_engine", "kappa", "fuzzy_oracle",
   "recall_oracle", "recall_runner", "example_exception_oracle",
   "golden_fixtures", "golden_prds", "golden_kappa",
+  # Sealed-capture layer (capture-v0). Flat, stdlib-only, zero runtime deps.
+  "capture_log", "capture_store", "capture_provenance",
+  "capture_admissibility", "capture_subprocess",
+  "golden_admissibility", "run_tamper_eval", "run_capture_demo",
 ]
