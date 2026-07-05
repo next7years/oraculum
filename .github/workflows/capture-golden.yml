@@ -1,5 +1,7 @@
 name: capture-golden
 
+# Verified green on both `push` (to main) and `pull_request` events (capture-v0
+# §7 M7 DoD).
 # Regression gate for the sealed-capture layer (capture-v0 §8). Any change that
 # weakens tamper detection, loosens the admissibility gate, or lets a self-report
 # through breaks this workflow with a named reason code. Everything is offline,
